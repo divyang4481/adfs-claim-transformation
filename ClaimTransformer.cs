@@ -30,6 +30,13 @@ namespace ClaimTransformer {
 		}
 	}
 
+	public class GroupAuthorizationConfigurationElement : ConfigurationElement {
+		[ConfigurationProperty("Group", IsRequired=true)]
+		public string Group {
+			get { return this["Group"] as string; }
+		}
+	}
+
 	public class GlobalMappingCollection : ConfigurationElementCollection {
 
 		public MappingConfigurationElement this[int index] {
@@ -72,6 +79,37 @@ namespace ClaimTransformer {
 		}
 	}
 	
+	public class GroupAuthorizationCollection : ConfigurationElementCollection {
+
+		[ConfigurationProperty("Mode", IsRequired=true)]
+		public string Mode {
+			get { return this["Mode"] as string; }
+		}
+
+		[ConfigurationProperty("Message", IsRequired=true)]
+		public string Message {
+			get { return this["Message"] as string; }
+		}
+
+		public GroupAuthorizationConfigurationElement this[int index] {
+			get { return base.BaseGet(index) as GroupAuthorizationConfigurationElement; }
+			set {
+				if (base.BaseGet(index) != null) {
+					base.BaseRemoveAt(index);
+				}
+				this.BaseAdd(index, value);
+			}
+		}
+	   
+		protected override object GetElementKey(ConfigurationElement element) {
+			return element.GetHashCode();
+		}
+
+		protected override ConfigurationElement CreateNewElement() {
+			return new GroupAuthorizationConfigurationElement();
+		}
+	}
+
 	public class RulesConfiguration : ConfigurationSection {
 		[ConfigurationProperty("GlobalMappings")]
 		public GlobalMappingCollection GlobalMappings {
@@ -80,6 +118,10 @@ namespace ClaimTransformer {
 		[ConfigurationProperty("GroupMappings")]
 		public GroupMappingCollection GroupMappings {
 			get { return this["GroupMappings"] as GroupMappingCollection; }
+		}
+		[ConfigurationProperty("GroupAuthorization")]
+		public GroupAuthorizationCollection GroupAuthorization {
+			get { return this["GroupAuthorization"] as GroupAuthorizationCollection; }
 		}
 	}
  
@@ -104,6 +146,23 @@ namespace ClaimTransformer {
 
 			if (transformStage != ClaimTransformStage.PostProcessing)
 				return;
+			
+			if (m_rules.GroupAuthorization != null) {
+				bool hasMatch = false;
+				foreach (SecurityProperty securityProperty in corporateClaims) { 			
+					foreach (GroupAuthorizationConfigurationElement e in m_rules.GroupAuthorization) {
+						if (securityProperty.Equals(SecurityProperty.CreateGroupProperty(e.Group))) {
+							hasMatch = true;
+						}
+					}
+				}
+		
+				if (m_rules.GroupAuthorization.Mode == "include") {
+					if (hasMatch == false) throw new ApplicationException(m_rules.GroupAuthorization.Message);
+				} else if (m_rules.GroupAuthorization.Mode == "exclude") {
+					if (hasMatch == true) throw new ApplicationException(m_rules.GroupAuthorization.Message);
+				}
+			}
 
 	 		foreach (MappingConfigurationElement e in m_rules.GlobalMappings) {
 				if (outgoingClaims == null) outgoingClaims = new SecurityPropertyCollection();

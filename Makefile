@@ -1,5 +1,5 @@
 NAME = ClaimTransformer
-VERSION = 1.0.1
+VERSION = 1.1
 MONOCC = gmcs
 MONO   = mono
 TARGET = $(NAME).exe
@@ -23,7 +23,7 @@ all: $(PROGS)
 	$(MONOCC) -r:$(LIBS) $<
 
 clean:
-	rm -f $(PROGS) $(DIST)
+	rm -f $(PROGS) *.zip
 
 run:
 	$(MONO_FLAGS) $(MONO) $(TARGET)
