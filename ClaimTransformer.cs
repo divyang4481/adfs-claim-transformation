@@ -142,11 +142,25 @@ namespace ClaimTransformer {
  			string strTargetURI) {
 
 			if (m_rules == null)
+				// no processing rules have been configured
 				return;
 
+			// if (incomingClaims != null)
+				// we are not an Account Partner, but a resource partner
+			//	return;
+
 			if (transformStage != ClaimTransformStage.PostProcessing)
+				// we are not (yet) in the right phase
 				return;
 			
+	 		foreach (MappingConfigurationElement e in m_rules.GlobalMappings) {
+				if (outgoingClaims == null) outgoingClaims = new SecurityPropertyCollection();
+				outgoingClaims.Add(SecurityProperty.CreateCustomClaimProperty(e.Name, e.Value));
+ 			}
+ 
+			if (corporateClaims == null)
+				return;
+
 			if (m_rules.GroupAuthorization != null) {
 				bool hasMatch = false;
 				foreach (SecurityProperty securityProperty in corporateClaims) { 			
@@ -163,14 +177,6 @@ namespace ClaimTransformer {
 					if (hasMatch == true) throw new ApplicationException(m_rules.GroupAuthorization.Message);
 				}
 			}
-
-	 		foreach (MappingConfigurationElement e in m_rules.GlobalMappings) {
-				if (outgoingClaims == null) outgoingClaims = new SecurityPropertyCollection();
-				outgoingClaims.Add(SecurityProperty.CreateCustomClaimProperty(e.Name, e.Value));
- 			}
-
-			if (corporateClaims == null)
-				return;
 
 			foreach (SecurityProperty securityProperty in corporateClaims) { 			
 	 			foreach (GroupMappingConfigurationElement e in m_rules.GroupMappings) {
