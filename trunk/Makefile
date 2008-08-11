@@ -1,5 +1,5 @@
 NAME = ClaimTransformer
-VERSION = 1.1
+VERSION = 1.2
 MONOCC = gmcs
 MONO   = mono
 TARGET = $(NAME).exe
