@@ -321,7 +321,7 @@ namespace ClaimTransformer
           }
         }
 
-				foreach (PrefixConfigurationElement e in m_rules.Prefixes)
+        foreach (PrefixConfigurationElement e in m_rules.Prefixes)
         {
           if (securityProperty.Name.Equals(e.Name))
           {
@@ -330,29 +330,32 @@ namespace ClaimTransformer
               SecurityProperty.CreateCustomClaimProperty(e.Name, value));
           }
         }
-
-        //Build a new claim with configured claimattributes and strings
-        string claimbuilderValue = string.Empty;
-        foreach (ClaimbuilderConfigurationElement e in m_rules.Claimbuilder)
+      }
+      
+      //Build a new claim with configured claimattributes and strings
+      string claimbuilderValue = string.Empty;
+      foreach (ClaimbuilderConfigurationElement e in m_rules.Claimbuilder)
+      {
+        if (!string.IsNullOrEmpty(e.ClaimValue))
         {
-          if (!string.IsNullOrEmpty(e.ClaimValue))
+          //check if the claim uri exists in the collection.
+          SecurityPropertyCollection tempCollection = corporateClaims.GetCustomProperties(e.ClaimValue);
+          //claim found extract value and add to claimbuilderValue.
+          if (tempCollection.Count == 1)
           {
-            //check if the claim uri exists in the collection.
-            SecurityPropertyCollection tempCollection = corporateClaims.GetCustomProperties(e.ClaimValue);
-            //claim found extract value and add to claimbuilderValue.
-            if (tempCollection.Count == 1)
-            {
-              claimbuilderValue = claimbuilderValue + tempCollection[0].Value;
-            }
-          }
-          else if (!string.IsNullOrEmpty(e.StringValue))
-          {
-            claimbuilderValue = claimbuilderValue + e.StringValue;
+            claimbuilderValue = claimbuilderValue + tempCollection[0].Value;
           }
         }
-        outgoingClaims.Add(
-        SecurityProperty.CreateCustomClaimProperty(m_rules.Claimbuilder.ClaimName, claimbuilderValue));
+        else if (!string.IsNullOrEmpty(e.StringValue))
+        {
+          claimbuilderValue = claimbuilderValue + e.StringValue;
+        }
       }
+      if (!string.IsNullOrEmpty(claimbuilderValue)) {
+         outgoingClaims.Add(
+    	    SecurityProperty.CreateCustomClaimProperty(m_rules.Claimbuilder.ClaimName, claimbuilderValue));
+      }
+      
     }
 
     private void displayClaims(SecurityPropertyCollection securityPropertyCollection)
@@ -394,7 +397,11 @@ namespace ClaimTransformer
       string strTargetURI = null;
 
       corporateClaims.Add(SecurityProperty.CreateGroupProperty("Administrators"));
-
+      corporateClaims.Add(SecurityProperty.CreateCustomClaimProperty("urn:mace:dir:attribute-def:uid", "hansz"));
+      corporateClaims.Add(SecurityProperty.CreateCustomClaimProperty("urn:mace:dir:attribute-def:givenName", "Hans"));
+      corporateClaims.Add(SecurityProperty.CreateCustomClaimProperty("MiddleName", "J.F."));
+      corporateClaims.Add(SecurityProperty.CreateCustomClaimProperty("urn:mace:dir:attribute-def:sn", "Zandbelt"));
+ 
       ClaimTransformer o = new ClaimTransformer();
       o.TransformClaims(ref incomingClaims, ref corporateClaims, ref outgoingClaims, transformStage, strIssuer, strTargetURI);
 

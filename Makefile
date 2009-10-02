@@ -1,5 +1,5 @@
 NAME = ClaimTransformer
-VERSION = 1.2
+VERSION = 1.4
 MONOCC = gmcs
 MONO   = mono
 TARGET = $(NAME).exe
@@ -25,7 +25,7 @@ all: $(PROGS)
 clean:
 	rm -f $(PROGS) *.zip
 
-run:
+run: $(PROGS)
 	$(MONO_FLAGS) $(MONO) $(TARGET)
 
 web.config: ClaimTransformer.exe.config
