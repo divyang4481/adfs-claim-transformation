@@ -1,0 +1,9 @@
+COMPILATION
+===========
+
+In Visual Studio this project can be compiled if the ADFS SDK has been installed.
+
+On Linux you have to install the required assemblies in a library directory first.
+The library directory is specified in the Makefile variable LIBDIR, the libraries
+are specified in the LIB variable. Libraries can be found on the Windows Server 2003
+installation CD.
