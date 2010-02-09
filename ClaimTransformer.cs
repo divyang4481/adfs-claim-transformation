@@ -269,9 +269,9 @@ namespace ClaimTransformer
         // no processing rules have been configured
         return;
 
-      // if (incomingClaims != null)
+      if (incomingClaims != null)
       // we are not an Account Partner, but a resource partner
-      //	return;
+      	return;
 
       if (transformStage != ClaimTransformStage.PostProcessing)
         // we are not (yet) in the right phase
@@ -397,10 +397,6 @@ namespace ClaimTransformer
       string strTargetURI = null;
 
       corporateClaims.Add(SecurityProperty.CreateGroupProperty("Administrators"));
-      corporateClaims.Add(SecurityProperty.CreateCustomClaimProperty("urn:mace:dir:attribute-def:uid", "hansz"));
-      corporateClaims.Add(SecurityProperty.CreateCustomClaimProperty("urn:mace:dir:attribute-def:givenName", "Hans"));
-      corporateClaims.Add(SecurityProperty.CreateCustomClaimProperty("MiddleName", "J.F."));
-      corporateClaims.Add(SecurityProperty.CreateCustomClaimProperty("urn:mace:dir:attribute-def:sn", "Zandbelt"));
  
       ClaimTransformer o = new ClaimTransformer();
       o.TransformClaims(ref incomingClaims, ref corporateClaims, ref outgoingClaims, transformStage, strIssuer, strTargetURI);
