@@ -1,0 +1,8 @@
+1. merge the web.config snippet into C:\ADFS\sts\web.config
+   and adapt it to your situation
+   (follow the guidelines in the XML comments)
+2. copy the DLL into C:\ADFS\sts\bin
+3. allow read access to DLL for entity "Network Service"
+4. configure ADFS Trust Policy by selecting the tab called
+   "Custom Transformation" and by pointing to the DLL
+   and setting the classname to: "ClaimTransformer.ClaimTransformer"
